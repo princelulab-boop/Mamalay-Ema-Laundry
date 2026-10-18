@@ -139,7 +139,7 @@ $('bookingForm').addEventListener('submit', async e => {
     button.textContent = 'Send booking request';
   }
 });
-
+$('trackForm').addEventListener('submit',e=>{
  e.preventDefault();const ref=String(new FormData(e.currentTarget).get('ref')).trim().toUpperCase();
  const o=state.orders.find(x=>x.ref.toUpperCase()===ref);const box=$('trackResult');box.classList.remove('hidden');
  box.textContent=o?`Booking ${o.ref}: ${o.status}. Service: ${o.service}; ${o.loads} load(s). Estimated total: ${money(o.total)}. Please contact the shop if you need confirmation.`:'We could not find that reference in this browser. In this demo, bookings are not shared across devices.';
