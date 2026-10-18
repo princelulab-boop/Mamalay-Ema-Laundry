@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#167d91">
+<title>Mamalay Ema Laundry Shop</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="logo.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="top">
+  <img class="brand-logo" src="logo.png" alt="Mamalay Ema Laundry Shop logo">
+  <div><h1>Mamalay Ema</h1><p>LAUNDRY SHOP</p></div>
+  <button id="ownerToggle" class="outline small">Owner</button>
+</header>
+<section class="hero">
+  <img class="hero-logo" src="logo.png" alt="Mamalay Ema Laundry Shop logo">
+  <span class="eyebrow">FRESH • CLEAN • READY</span>
+  <h2>Laundry day, made easier.</h2>
+  <p>Book your laundry service with Mamalay Ema Laundry Shop.</p><p class="hero-offer">₱160 per load · Maximum 8 kg per load<br>Pickup & delivery: ₱10 · After 3 completed laundry orders, your next pickup & delivery fee is free</p>
+  <a class="button" href="#booking">Book a service</a>
+</section>
+<main>
+  <section class="panel">
+    <h2>Our services</h2>
+    <div class="services">
+      <article><div class="emoji">🧺</div><h3>Wash &amp; dry</h3><p>Our main laundry service. Maximum 8 kg per load.</p><strong>₱160 / load</strong></article>
+      <article><div class="emoji">🚚</div><h3>Pickup &amp; delivery</h3><p>Available by request within the shop service area.</p><strong>₱10 per pickup/delivery booking</strong></article>
+      <article><div class="emoji">🎁</div><h3>Loyalty reward</h3><p>After 3 completed laundry orders, the pickup & delivery fee on your next eligible order is free. The laundry service itself is still charged.</p><strong>Ask the shop to confirm your reward</strong></article>
+      <article><div class="emoji">👕</div><h3>Folding</h3><p>Ask the shop about folding availability and pricing.</p><strong>Price confirmed by shop</strong></article>
+    </div>
+    <p class="note">Wash &amp; dry is ₱160 per load for up to 8 kg. Loads over 8 kg should be separated and priced as additional loads. Pickup and delivery is ₱10 per booking, with a free pickup & delivery fee on the next eligible order after 3 completed laundry orders. The laundry service itself is still charged. Confirm the reward with the shop.</p>
+  </section>
+
+  <section class="panel" id="booking">
+    <h2>Book your laundry</h2>
+    <p class="sub">Fill in your details. The shop will confirm your booking and final price.</p>
+    <form id="bookingForm">
+      <label>Full name<input name="name" required maxlength="80" placeholder="Your name"></label>
+      <label>Mobile number<input name="phone" required type="tel" maxlength="30" placeholder="09XX XXX XXXX"></label>
+      <label>Service
+        <select name="service" id="service" required>
+          <option value="Wash & Dry">Wash &amp; dry — ₱160 per load (up to 8 kg)</option><option value="Folding">Folding — price to be confirmed</option>
+        </select>
+      </label>
+      <label>Number of loads<input name="loads" type="number" min="1" max="50" value="1" required><small>Each load is a maximum of 8 kg.</small></label>
+      <label>How will you give us the laundry?
+        <select name="handling" id="handling"><option value="Drop-off">Drop off at shop</option><option value="Pickup & delivery">Home pickup &amp; delivery (subject to confirmation)</option></select>
+      </label>
+      <label id="addressWrap" class="hidden">Pickup/delivery address<textarea name="address" rows="2" placeholder="House number, street, barangay, nearby landmark"></textarea></label>
+      <label>Preferred date<input name="date" type="date" required></label>
+      <label>Preferred time<select name="time"><option>Morning</option><option>Afternoon</option><option>Evening</option></select></label>
+      <label>Payment method<select name="payment"><option>Cash</option><option>GCash (shop will confirm payment details)</option></select></label>
+      <label>Notes (optional)<textarea name="notes" rows="3" maxlength="500" placeholder="Special instructions"></textarea></label>
+      <div class="estimate"><span>Estimated total</span><strong id="estimate">To be confirmed</strong></div>
+      <p class="note">This is a booking request, not a confirmed appointment. The shop must confirm availability, price, pickup area, and any GCash instructions.</p>
+      <button class="button full" type="submit">Send booking request</button>
+    </form>
+    <div id="bookingResult" class="result hidden" role="status"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Check an order</h2>
+    <p class="sub">Enter the booking reference given after you submit a request on this device.</p>
+    <form id="trackForm" class="trackform"><label>Booking reference<input name="ref" required placeholder="e.g. ME-123456"></label><button class="button" type="submit">Check status</button></form>
+    <div id="trackResult" class="result hidden"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Visit or contact us</h2>
+    <p><strong>Mamalay Ema Laundry Shop</strong></p>
+    <p>P-1, Poblacion, Alegria, Surigao del Norte</p>
+    <p>Call us: <a href="tel:09940457259">0994 045 7259</a></p><p>Business hours: 7:00 AM–8:00 PM daily (confirm days of operation before launch).</p>
+    <p class="note">Pickup and delivery are subject to confirmation of your address and service area.</p>
+  </section>
+
+  <section id="ownerPanel" class="panel hidden">
+    <div class="ownerhead"><div><h2>Owner dashboard</h2><p class="sub">Manage requests on this browser only in this demo. Standard price: ₱160 per load (up to 8 kg); pickup/delivery fee: ₱10.</p></div><button id="ownerClose" class="outline small">Close</button></div>
+    <div class="warning"><strong>Demo privacy note:</strong> This prototype has no owner login or cloud database. Do not publish it as a live order system until secure hosting, authentication, and shared storage are configured.</div>
+    <h3>Shop prices (PHP per load)</h3>
+    <div class="pricegrid">
+      <label>Wash &amp; dry per load<input id="priceBoth" type="number" min="0" value="160"></label>
+      <label>Pickup &amp; delivery fee<input id="pickupFee" type="number" min="0" value="10"></label>
+      <label>Loads per order are limited to 8 kg each<input id="maxKg" type="number" min="1" value="8" disabled></label>
+    </div>
+    <button id="savePrices" class="button">Save prices on this device</button>
+    <div class="ownerhead"><h3>Booking requests</h3><button id="exportCsv" class="outline small">Export CSV</button></div>
+    <div id="ownerOrders" class="orders"><p class="sub">No booking requests on this browser yet.</p></div>
+  </section>
+</main>
+<footer><p>© <span id="year"></span> Mamalay Ema Laundry Shop</p><p>Customer booking website prototype</p></footer>
+<script src="app.js"></script>
+</body>
+</html>
