@@ -38,22 +38,108 @@ function renderOrders(){
 }
 $('bookingForm').elements.handling.addEventListener('change',e=>$('addressWrap').classList.toggle('hidden',e.target.value!=='Pickup & delivery'));
 $('bookingForm').addEventListener('input',updateEstimate);$('bookingForm').elements.service.addEventListener('change',updateEstimate);
-$('bookingForm').addEventListener('submit',e=>{
- e.preventDefault();const f=e.currentTarget,fd=new FormData(f);
- const handling=fd.get('handling'),address=String(fd.get('address')||'').trim();
- if(handling==='Pickup & delivery'&&!address){alert('Please enter your pickup/delivery address.');return}
- const loads=Math.max(1,Number(fd.get('loads'))||1);
- const ref='ME-'+Math.floor(100000+Math.random()*900000);
- const service=fd.get('service');const pickupCharge=handling==='Pickup & delivery'?(state.prices.pickup??10):0;const total=service==='Folding'?null:priceFor(service)*loads+pickupCharge;
- const previousOrders=state.orders.filter(o=>o.phone===String(fd.get('phone')).trim()&&o.status==='Completed').length;
- const loyaltyEligible=handling==='Pickup & delivery'&&previousOrders>=3;
- const order={ref,name:String(fd.get('name')).trim(),phone:String(fd.get('phone')).trim(),service,loads,handling,address,date:fd.get('date'),time:fd.get('time'),payment:fd.get('payment'),notes:String(fd.get('notes')||'').trim(),pickupCharge:loyaltyEligible?0:pickupCharge,loyaltyEligible,total:total===null?null:total-(loyaltyEligible?pickupCharge:0),status:'Requested',created:new Date().toLocaleString()};
- state.orders.push(order);save();renderOrders();
- $('bookingResult').classList.remove('hidden');
- $('bookingResult').textContent=`Booking request saved on this device. Your reference is ${ref}. ${order.total===null?'Folding price will be confirmed by the shop.':'Estimated total: '+money(order.total)+'.'} ${loyaltyEligible?'Your phone number has 3 completed orders in this browser, so this booking has a free pickup/delivery fee estimate. The laundry service itself is still charged. The shop must confirm your loyalty reward.':''} Status: Requested. Please contact the shop to confirm. Save your reference to check status on this same browser.`;
- f.reset();$('addressWrap').classList.add('hidden');updateEstimate();
+
+$('bookingForm').addEventListener('submit', async e => {
+  e.preventDefault();
+
+  const f = e.currentTarget;
+  const fd = new FormData(f);
+  const handling = fd.get('handling');
+  const address = String(fd.get('address') || '').trim();
+
+  if (handling === 'Pickup & delivery' && !address) {
+    alert('Please enter your pickup/delivery address.');
+    return;
+  }
+
+  const loads = Math.max(1, Number(fd.get('loads')) || 1);
+  const ref = 'ME-' + Math.floor(100000 + Math.random() * 900000);
+  const service = fd.get('service');
+  const pickupCharge = handling === 'Pickup & delivery'
+    ? (state.prices.pickup ?? 10) : 0;
+
+  const total = service === 'Folding'
+    ? null : priceFor(service) * loads + pickupCharge;
+
+  const previousOrders = state.orders.filter(o =>
+    o.phone === String(fd.get('phone')).trim() &&
+    o.status === 'Completed'
+  ).length;
+
+  const loyaltyEligible =
+    handling === 'Pickup & delivery' && previousOrders >= 3;
+
+  const order = {
+    ref,
+    name: String(fd.get('name')).trim(),
+    phone: String(fd.get('phone')).trim(),
+    service,
+    loads,
+    handling,
+    address,
+    date: fd.get('date'),
+    time: fd.get('time'),
+    payment: fd.get('payment'),
+    notes: String(fd.get('notes') || '').trim(),
+    pickupCharge: loyaltyEligible ? 0 : pickupCharge,
+    loyaltyEligible,
+    total: total === null ? null :
+      total - (loyaltyEligible ? pickupCharge : 0),
+    status: 'Requested',
+    created: new Date().toLocaleString()
+  };
+
+  fd.append('_subject', 'New Laundry Booking - ' + ref);
+  fd.append('Booking reference', ref);
+  fd.append('Estimated total',
+    order.total === null ? 'Price to be confirmed' : money(order.total));
+  fd.append('Pickup/delivery fee', money(order.pickupCharge));
+  fd.append('Loyalty reward possible', loyaltyEligible ? 'Yes' : 'No');
+
+  const button = f.querySelector('button[type="submit"]');
+  button.disabled = true;
+  button.textContent = 'Sending booking...';
+
+  try {
+    const response = await fetch(
+      'https://formsubmit.app/f/bmgn7fj85f',
+      {
+        method: 'POST',
+        headers: { Accept: 'application/json' },
+        body: fd
+      }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok || !result.ok) {
+      throw new Error(result.error || 'Booking could not be sent.');
+    }
+
+    state.orders.push(order);
+    save();
+    renderOrders();
+
+    $('bookingResult').classList.remove('hidden');
+    $('bookingResult').textContent =
+      `Booking request sent! Your reference is ${ref}. ` +
+      'Please wait for the shop to confirm your booking and final price.';
+
+    f.reset();
+    $('addressWrap').classList.add('hidden');
+    updateEstimate();
+
+  } catch (error) {
+    alert(
+      'We could not confirm that your booking was sent. ' +
+      'Please try again or contact the shop before submitting again.'
+    );
+  } finally {
+    button.disabled = false;
+    button.textContent = 'Send booking request';
+  }
 });
-$('trackForm').addEventListener('submit',e=>{
+
  e.preventDefault();const ref=String(new FormData(e.currentTarget).get('ref')).trim().toUpperCase();
  const o=state.orders.find(x=>x.ref.toUpperCase()===ref);const box=$('trackResult');box.classList.remove('hidden');
  box.textContent=o?`Booking ${o.ref}: ${o.status}. Service: ${o.service}; ${o.loads} load(s). Estimated total: ${money(o.total)}. Please contact the shop if you need confirmation.`:'We could not find that reference in this browser. In this demo, bookings are not shared across devices.';
